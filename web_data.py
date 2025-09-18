@@ -42,7 +42,7 @@ def process():
 
             # Convert DataFrame to Excel in memory
             absolute_path = os.path.dirname(__file__)
-            file_path = os.path.join(absolute_path, 'gtu_result_analysis.xlsx')
+            file_path = os.path.join(absolute_path, 'GTU_RESULT_ANALYSIS.xlsx')
             # file_path = 'gtu_result_analysis.xlsx'
             with open(file_path, "rb") as f:
                 st.success("✅ Your file is ready! Click below to download.")
