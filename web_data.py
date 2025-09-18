@@ -16,8 +16,10 @@ def process():
         return excel_file
 
     # Streamlit app
-
-    df1 = pd.read_excel("BRANCH_CODE.xlsx")
+    absolute_path = os.path.dirname(__file__)
+    file_path = os.path.join(absolute_path, 'BRANCH_CODE.xlsx')
+    # load workbook (template)
+    df1 = pd.read_excel(file_path)
     b_code = df1["Branch_code"].tolist()
     br = st.selectbox("Select Branch", b_code)
     option1 = st.selectbox('Are you sure?', ('N', 'Y'))
