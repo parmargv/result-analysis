@@ -221,7 +221,7 @@ def result_ana(df: pd.DataFrame, branch):
         TOTAL = len(df_sub)
         FF = int(df_sub[df_sub.get('SUB_GRADE', pd.Series()) == 'FF'].shape[0]) if TOTAL > 0 and 'SUB_GRADE' in df_sub.columns else 0
         PASS = TOTAL - FF if TOTAL > 0 else 0
-        PER = (PASS / TOTAL) * 100 if TOTAL > 0 else 0.0
+        PER = round((PASS / TOTAL) * 100,2) if TOTAL > 0 else 0.0
         RES = int(df_sub[df_sub.get('SEM_RESULT', pd.Series()) == 'PASS'].shape[0]) if TOTAL > 0 and 'SEM_RESULT' in df_sub.columns else 0
         R_PER = (RES / TOTAL) * 100 if TOTAL > 0 else 0.0
 
