@@ -47,7 +47,7 @@ def result_ana(df: pd.DataFrame, branch):
     """
 
     absolute_path = os.path.dirname(__file__)
-    file_path = os.path.join(absolute_path, 'gtu_result_analysis.xlsx')
+    file_path = os.path.join(absolute_path, 'GTU_RESULT_ANALYSIS.xlsx')
 
     # load workbook (template)
     wb = load_workbook(file_path)
