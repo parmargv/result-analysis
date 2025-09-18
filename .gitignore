@@ -1,0 +1,14 @@
+# created by virtualenv automatically
+.idea
+Lib
+Scripts
+pyvenv.cfg
+__pycache__
+*.pyc
+.env
+.vscode
+.DS_Store
+instance
+.webassets-cache
+migrations
+*.sqlite3
