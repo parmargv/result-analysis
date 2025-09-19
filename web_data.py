@@ -3,6 +3,8 @@ import pandas as pd
 import result
 import os
 import time
+from openpyxl import load_workbook
+from openpyxl.utils import get_column_letter
 def main():
     st.set_page_config(page_title="Excel Processor", layout="centered")
     st.title("📊 Result Processing App")
@@ -12,7 +14,6 @@ def main():
 def process():
     def process_data(df,branch):
         excel_file = result.result_ana(df, branch)
-        # Example: Add a new column (replace this with your logic)
         return excel_file
 
     # Streamlit app
@@ -40,13 +41,35 @@ def process():
             #     f.write(uploaded_file.getbuffer())
             # df = pd.read_excel("temp.xlsx")
 
+
             if st.button("Process Data"):
                 file = process_data(df,branch)
                 st.write("Data Processing....")
-
                 # Convert DataFrame to Excel in memory
                 absolute_path = os.path.dirname(__file__)
                 file_path = os.path.join(absolute_path, 'GTU_RESULT_ANALYSIS.xlsx')
+                wb = load_workbook(file_path)
+                ex = wb['exam']
+                Inst_Code = ex['A1'].value
+                # Inst_Code = ex.cell(row=1, column=1).value
+                wb.save('GTU_RESULT_ANALYSIS.xlsx')
+                absolute_path = os.path.dirname(__file__)
+                file_path = os.path.join(absolute_path, 'Diploma_Engineering.xlsx')
+                df11 = pd.read_excel(file_path)
+                Inst_name = df11.loc[df11['inst_code'] == Inst_Code, 'inst_name'].values[0]
+
+                absolute_path = os.path.dirname(__file__)
+                file_path = os.path.join(absolute_path, 'GTU_RESULT_ANALYSIS.xlsx')
+                wb = load_workbook(file_path)
+                ex = wb['exam']
+                ex['C1']= Inst_name
+                wb.save('GTU_RESULT_ANALYSIS.xlsx')
+                # ex.cell(row=1, column=1).value = Inst_name
+                # ex.cell(row=2, column=3).value = Inst_address
+                # ex.cell(row=2, column=10).value = Inst_type
+                # wb.save(file_path)
+                # wb.close()
+
                 # file_path = 'gtu_result_analysis.xlsx'
                 with open(file_path, "rb") as f:
                     st.success("✅ Your file is ready! Click below to download.")
@@ -57,9 +80,11 @@ def process():
                         file_name="processed_file.xlsx",
                         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                     )
-                os.remove("temp.xlsx")
+
         except Exception as e:
             st.error(f"❌ Invalid file format or processing error: {e}")
+
+        # os.remove("temp.xlsx")
     else:
         st.info("Please upload an Excel file to continue.....")
             #st.markdown(f'<h1 style="color:#319AA2 ;font-size:30px;">Welcome to result analysis</h1>', unsafe_allow_html=True)

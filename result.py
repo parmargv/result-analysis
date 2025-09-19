@@ -4,6 +4,8 @@ from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter
 import math
 
+
+
 # ---- Helpers ----------------------------------------------------------------
 def clear_range(ws, start_row, start_col, end_row, end_col):
     """Clear cells in numeric coordinate range."""
@@ -45,7 +47,6 @@ def result_ana(df: pd.DataFrame, branch):
     - fills sheets: C_TO_D, sub1..sub8, exam, list
     - saves workbook back to same file and returns file_path
     """
-
     absolute_path = os.path.dirname(__file__)
     file_path = os.path.join(absolute_path, 'GTU_RESULT_ANALYSIS.xlsx')
 
@@ -68,7 +69,10 @@ def result_ana(df: pd.DataFrame, branch):
         return file_path
 
     df = df.sort_values(by='MAP_NUMBER', ignore_index=True)
+    Inst_Code =df['instcode'].iloc[-1]
+    Branch_name = df['BR_NAME'].iloc[-1]
 
+    # print(Inst_name)
     # safe extraction of sem and starting numbers
     try:
         sem = int(df['sem'].iloc[0])
@@ -171,7 +175,7 @@ def result_ana(df: pd.DataFrame, branch):
     df_reg = df_reg.loc[:, available_cols].copy()
 
     # Clear list sheet area once (like original does before first write)
-    clear_range_a1(lst, "A1:Z100")
+    # clear_range_a1(lst, "A1:Z100")
 
     # function to write list failures at the correct start columns:
     def write_fail_list(df_fail, subj_idx):
@@ -267,6 +271,8 @@ def result_ana(df: pd.DataFrame, branch):
 
         # For the first subject (like original), set some summary cells (A4, G4, I4, M4)
         if i == 1:
+            ex.cell(row=1, column=1).value = Inst_Code  # A4
+            ex.cell(row=2, column=3).value = Branch_name  # A4
             ex.cell(row=4, column=1).value = exam  # A4
             ex.cell(row=4, column=7).value = TOTAL  # G4
             ex.cell(row=4, column=9).value = RES    # I4
@@ -306,9 +312,9 @@ def result_ana(df: pd.DataFrame, branch):
     if b18_val is None or (isinstance(b18_val, float) and math.isnan(b18_val)) or str(b18_val).strip() == "":
         clear_range(ex, 18, 4, 20, 14)
 
+
     # Save back to same template file (overwrites template). If you'd rather create new file, change file_path.
     wb.save(file_path)
-
     # Return path so web_data.py can open and download it
     return file_path
 
