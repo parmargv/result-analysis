@@ -14,6 +14,10 @@ def main():
 def process():
     def process_data(df,branch):
         excel_file = result.result_ana(df, branch)
+        data = result.result_ana(df, branch)
+        excel_file = data[0]
+        visitor_count = int(data[1]/2)
+        st.metric("Total Visitors", visitor_count)
         return excel_file
 
     # Streamlit app
@@ -34,6 +38,8 @@ def process():
         st.write("Uploaded file name:", uploaded_file.name)
         try:
             df = pd.read_excel(uploaded_file)
+            inst_type = df['extype'].iloc[0]
+
             if "BR_CODE" not in df.columns:
                 st.error("❌ The uploaded file is missing the required column: 'BR_CODE'. Please upload a proper file.")
                 return  # stop execution for this file
@@ -54,7 +60,11 @@ def process():
                 # Inst_Code = ex.cell(row=1, column=1).value
                 wb.save('GTU_RESULT_ANALYSIS.xlsx')
                 absolute_path = os.path.dirname(__file__)
-                file_path = os.path.join(absolute_path, 'Diploma_Engineering.xlsx')
+                if inst_type == "DI":
+                    file_path = os.path.join(absolute_path, 'Diploma_Engineering.xlsx')
+                elif inst_type =="BE":
+                    file_path = os.path.join(absolute_path, 'D_INST_CODE.xlsx')
+
                 df11 = pd.read_excel(file_path)
                 Inst_name = df11.loc[df11['inst_code'] == Inst_Code, 'inst_name'].values[0]
 

@@ -4,7 +4,22 @@ from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter
 import math
 
+def get_count():
+    if os.path.exists("counter.txt"):
+        with open("counter.txt", "r") as f:
+            count = int(f.read().strip())
+    else:
+        count = 0
+    return count
 
+# Function to update visitor count
+def update_count():
+    count = get_count() + 1
+    with open("counter.txt", "w") as f:
+        f.write(str(count))
+    return count
+
+# st.title("📊 Visitor Counter")
 
 # ---- Helpers ----------------------------------------------------------------
 def clear_range(ws, start_row, start_col, end_row, end_col):
@@ -47,6 +62,7 @@ def result_ana(df: pd.DataFrame, branch):
     - fills sheets: C_TO_D, sub1..sub8, exam, list
     - saves workbook back to same file and returns file_path
     """
+    visitor_count = update_count()
     absolute_path = os.path.dirname(__file__)
     file_path = os.path.join(absolute_path, 'GTU_RESULT_ANALYSIS.xlsx')
 
@@ -316,7 +332,7 @@ def result_ana(df: pd.DataFrame, branch):
     # Save back to same template file (overwrites template). If you'd rather create new file, change file_path.
     wb.save(file_path)
     # Return path so web_data.py can open and download it
-    return file_path
+    return file_path,visitor_count
 
 
 
