@@ -45,7 +45,29 @@ def write_df_at(ws, df, start_row=1, start_col=1):
     for i, row in enumerate(df.values):
         for j, value in enumerate(row):
             ws.cell(row=start_row + 1 + i, column=start_col + j).value = value
+def get_institute_name(inst_type,inst_code):
+    absolute_path = os.path.dirname(__file__)
 
+    if inst_type == "BE":
+        file_name = "DE_INST_CODE.xlsx"
+    elif inst_type == "DI":
+        file_name = "DI_INST_CODE.xlsx"
+    else:
+        return ""
+
+    file_path = os.path.join(absolute_path, file_name)
+
+    if not os.path.exists(file_path):
+        return ""
+
+    df_inst = pd.read_excel(file_path)
+
+    match = df_inst[df_inst["inst_code"] == inst_code]
+
+    if not match.empty:
+        return match["inst_name"].iloc[0]
+
+    return ""
 
 # -------------------------------
 # MAIN FUNCTION
@@ -70,9 +92,19 @@ def result_ana(df: pd.DataFrame, branch):
         return file_path, visitor_count
 
     df = df.sort_values(by='MAP_NUMBER', ignore_index=True)
+    inst_type = df['extype'].iloc[0]
+    inst_code = df['instcode'].iloc[0]
+    sem_exam = df['exam'].iloc[0]
+    inst_name = get_institute_name(inst_type,inst_code)
+    br_name = df['BR_NAME'].iloc[0]
 
     # Remove old subject sheets except template sheets
     template_sheets = ["exam", "list", "C_TO_D"]
+    exam_ws = wb["exam"]
+    exam_ws["A1"] = inst_code
+    exam_ws["C1"] = inst_name
+    exam_ws["C2"] = br_name
+    exam_ws["A4"] = sem_exam
 
     for sheet in wb.sheetnames:
         if sheet not in template_sheets:
@@ -128,7 +160,8 @@ def result_ana(df: pd.DataFrame, branch):
                 col_code: "SUB_CODE",
                 col_name: "SUB_NAME",
                 col_grade: "SUB_GRADE",
-                "RESULT": "SEM_RESULT"
+                "RESULT": "SEM_RESULT",
+                "name": "NAME"
             }
 
             df_temp.rename(columns=rename_map, inplace=True)
@@ -171,6 +204,7 @@ def result_ana(df: pd.DataFrame, branch):
                 col_code = f"SUB{i}"
                 col_name = f"SUB{i}NA"
                 col_grade = f"SUB{i}GR"
+                col_res = "RESULT"
 
                 if col_code not in df.columns:
                     continue
@@ -180,7 +214,7 @@ def result_ana(df: pd.DataFrame, branch):
                 if df_temp.empty:
                     continue
 
-                required_cols = [col_code, col_name, col_grade]
+                required_cols = [col_code, col_name, col_grade, col_res]
                 required_cols = [c for c in required_cols if c in df_temp.columns]
 
                 df_temp = df_temp[required_cols]
@@ -188,7 +222,8 @@ def result_ana(df: pd.DataFrame, branch):
                 rename_map = {
                     col_code: "SUB_CODE",
                     col_name: "SUB_NAME",
-                    col_grade: "SUB_GRADE"
+                    col_grade: "SUB_GRADE",
+                    col_res:"SEM_RES"
                 }
 
                 df_temp.rename(columns=rename_map, inplace=True)
@@ -202,9 +237,15 @@ def result_ana(df: pd.DataFrame, branch):
 
             TOTAL = len(df_sub)
             FAIL = len(df_sub[df_sub["SUB_GRADE"] == "FF"])
+            S_FAIL = len(df_sub[df_sub["SEM_RES"] == "FAIL"])
+            S_PASS = len(df_sub[df_sub["SEM_RES"] == "PASS"])
             PASS = TOTAL - FAIL
             PER = round((PASS / TOTAL) * 100, 2) if TOTAL > 0 else 0
-
+            S_PER = round((S_PASS / TOTAL) * 100, 2) if TOTAL > 0 else 0
+            exam_ws = wb["exam"]
+            exam_ws["G4"] = TOTAL
+            exam_ws["I4"] = S_PASS
+            exam_ws["K4"] = S_PER
             # Grade Distribution
             grade_list = ["AA", "AB", "BB", "BC", "CC", "CD", "DD"]
             grade_count = {}
