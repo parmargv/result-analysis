@@ -100,11 +100,7 @@ def result_ana(df: pd.DataFrame, branch):
 
     # Remove old subject sheets except template sheets
     template_sheets = ["exam", "list", "C_TO_D"]
-    exam_ws = wb["exam"]
-    exam_ws["A1"] = inst_code
-    exam_ws["C1"] = inst_name
-    exam_ws["C2"] = br_name
-    exam_ws["A4"] = sem_exam
+
 
     for sheet in wb.sheetnames:
         if sheet not in template_sheets:
@@ -180,13 +176,19 @@ def result_ana(df: pd.DataFrame, branch):
         else:
             ws = wb.create_sheet(sheet_name)
 
-        clear_range_a1(ws, "A1:Z500")
+        clear_range_a1(ws, "A1:N3")
+        clear_range_a1(ws, "B8:N22")
         write_df_at(ws, df_sub, start_row=1, start_col=1)
         # ------------------------------------------
         # EXAM SHEET SUBJECT ANALYSIS (WITH GRADES)
         # ------------------------------------------
 
         exam_ws = wb["exam"]
+
+        exam_ws["A1"] = inst_code
+        exam_ws["C1"] = inst_name
+        exam_ws["C2"] = br_name
+        exam_ws["A4"] = sem_exam
 
         # Clear previous exam summary rows
         for row in exam_ws["B8:N30"]:
