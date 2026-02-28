@@ -97,7 +97,10 @@ def result_ana(df: pd.DataFrame, branch):
     sem_exam = df['exam'].iloc[0]
     inst_name = get_institute_name(inst_type,inst_code)
     br_name = df['BR_NAME'].iloc[0]
-
+    S_FAIL = (df['RESULT'] == 'FAIL').sum()
+    S_PASS = (df['RESULT'] == 'PASS').sum()
+    TOTAL = S_FAIL + S_PASS
+    S_PER = round((S_PASS / TOTAL) * 100, 2) if TOTAL > 0 else 0
     # Remove old subject sheets except template sheets
     template_sheets = ["exam", "list", "C_TO_D"]
 
@@ -239,13 +242,11 @@ def result_ana(df: pd.DataFrame, branch):
 
             TOTAL = len(df_sub)
             FAIL = len(df_sub[df_sub["SUB_GRADE"] == "FF"])
-            S_FAIL = len(df_sub[df_sub["SEM_RES"] == "FAIL"])
-            S_PASS = len(df_sub[df_sub["SEM_RES"] == "PASS"])
             PASS = TOTAL - FAIL
             PER = round((PASS / TOTAL) * 100, 2) if TOTAL > 0 else 0
-            S_PER = round((S_PASS / TOTAL) * 100, 2) if TOTAL > 0 else 0
+
             exam_ws = wb["exam"]
-            exam_ws["G4"] = TOTAL
+            exam_ws["G4"] = S_PASS + S_FAIL
             exam_ws["I4"] = S_PASS
             exam_ws["K4"] = S_PER
             # Grade Distribution
@@ -276,8 +277,12 @@ def result_ana(df: pd.DataFrame, branch):
 
             row_pointer += 1
 
-    wb.save(file_path)
 
+
+    wb.save(file_path)
+    # df = pd.read_excel("GTU_RESULT_ANALYSIS.xlsx", sheet_name="exam", usecols="D", skiprows=7, nrows=13)
+    # TOTAL = df.max().values[0]
+    # print("Maximum value:", TOTAL)
     return file_path, visitor_count
 
 
