@@ -2,22 +2,52 @@ import streamlit as st
 import pandas as pd
 import result
 import os
+import base64
 from openpyxl import load_workbook
 
+
 def main():
-    st.set_page_config(page_title="Excel Processor", layout="centered")
-    st.title("📊 Result Processing App")
+    st.set_page_config(page_title="GTU Result Analysis - AVPTI", layout="centered")
+
+    # ── Logo + Title header (single HTML block for perfect alignment) ──
+    absolute_path = os.path.dirname(__file__)
+    logo_path = os.path.join(absolute_path, "logo.jpg")
+
+    logo_b64 = ""
+    if os.path.exists(logo_path):
+        with open(logo_path, "rb") as f:
+            logo_b64 = base64.b64encode(f.read()).decode()
+
     st.markdown(
-        '<h2 style="color:#ffd700;font-size:15px;">Upload only excel .xlsx file.....</h2>',
+        f"""
+        <div style="display:flex;align-items:center;gap:20px;padding:10px 0 8px 0;">
+            <img src="data:image/jpeg;base64,{logo_b64}" width="110"
+                 style="flex-shrink:0;border-radius:6px;" />
+            <div>
+                <h2 style="margin:0;color:#F54927;font-size:26px;font-weight:700;line-height:1.3;">
+                    A. V. PAREKH TECHNICAL INSTITUTE RAJKOT
+                </h2>
+                <p style="margin:2px 0 0 0;color:#57A9C7;font-size:16px;">
+                    GTU Affiliated
+                </p>
+                <h3 style="margin:6px 0 0 0;color:#c8960c;font-size:30px;font-weight:700;">
+                    &#128202; GTU Result Analysis
+                </h3>
+            </div>
+        </div>
+        """,
         unsafe_allow_html=True
     )
+
+    st.divider()
     process()
+
 
 def process():
 
     def process_data(df, branch):
         file_path, visitor_count = result.result_ana(df, branch)
-        st.metric("Total Visitors", int(visitor_count/2))
+        st.metric("Total Visitors", int(visitor_count / 2))
         return file_path
 
     absolute_path = os.path.dirname(__file__)
@@ -44,7 +74,6 @@ def process():
                 return
 
             if st.button("Process Data"):
-
                 st.write("Processing Data...")
                 file_path = process_data(df, branch)
 
@@ -63,10 +92,14 @@ def process():
     else:
         st.info("Please upload Excel file.")
 
+    st.divider()
     st.markdown(
-        '<h2 style="color:#ffd700;font-size:18px;">Prepared by SHRI G.V.PARMAR AVPTI RAJKOT</h2>',
+        '<p style="color:#888;font-size:13px;text-align:center;">'
+        'Prepared by <strong>SHRI G.V. PARMAR</strong> &nbsp;|&nbsp; AVPTI, Rajkot'
+        '</p>',
         unsafe_allow_html=True
     )
+
 
 if __name__ == "__main__":
     main()
